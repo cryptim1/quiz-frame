@@ -109,6 +109,8 @@ export async function POST(req: NextRequest) {
         ? "Congratulations! You are smarter than a 5th grader!" 
         : "Oops! You are not smarter than a 5th grader.";
       
+      const shareText = `I scored ${score}/${questions.length} on "Are You Smarter Than a 5th Grader?" quiz! ${resultText} Try it yourself: ${BASE_URL}\n\nFrame made by @cryptim.eth`;
+      
       html = `
     <html>
       <head>
@@ -118,7 +120,7 @@ export async function POST(req: NextRequest) {
         <meta property="fc:frame:button:1:action" content="post_redirect" />
         <meta property="fc:frame:button:2" content="Play Again" />
         <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
-        <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ questionIndex, score, isInitialLoad: false }))}" />
+        <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ questionIndex, score, isInitialLoad: false, isSharing: true }))}" />
       </head>
       <body>
         <h1>Quiz Completed!</h1>
@@ -127,6 +129,21 @@ export async function POST(req: NextRequest) {
       </body>
     </html>
   `;
+    } else if (untrustedData?.state) {
+      const state = JSON.parse(decodeURIComponent(untrustedData.state));
+      if (state.isSharing) {
+        const resultText = score >= 4 
+          ? "Congratulations! I am smarter than a 5th grader!" 
+          : "Oops! I am not smarter than a 5th grader.";
+        const shareText = `I scored ${score}/${questions.length} on "Are You Smarter Than a 5th Grader?" quiz! ${resultText} Try it yourself: ${BASE_URL}\n\nFrame made by @cryptim.eth`;
+        
+        return new Response(null, {
+          status: 302,
+          headers: {
+            'Location': `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`
+          }
+        });
+      }
     } else {
       const currentQuestion = questions[questionIndex];
       const imageUrl = `${BASE_URL}/api/og?question=${encodeURIComponent(currentQuestion.question)}&number=${questionIndex + 1}`;
