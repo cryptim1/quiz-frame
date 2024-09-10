@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
     let html = '';
     if (isFinished) {
       const imageUrl = `${BASE_URL}/api/og?title=${encodeURIComponent(`Final Score: ${score}/${questions.length}`)}`;
+      console.log('Final image URL:', imageUrl);
       const resultText = score >= 4 
         ? "Congratulations! You are smarter than a 5th grader!" 
         : "Oops! You are not smarter than a 5th grader.";
@@ -148,7 +149,7 @@ export async function POST(req: NextRequest) {
       const currentQuestion = questions[questionIndex];
       console.log('Current question:', currentQuestion);
       const imageUrl = `${BASE_URL}/api/og?question=${encodeURIComponent(currentQuestion.question)}&number=${questionIndex + 1}`;
-      console.log('Generated image URL:', imageUrl);
+      console.log('Question image URL:', imageUrl);
       html = `
         <html>
           <head>

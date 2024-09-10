@@ -10,11 +10,11 @@ export async function GET(req: NextRequest) {
     const question = searchParams.get('question');
     const number = searchParams.get('number');
     const title = searchParams.get('title');
+    let resultText = searchParams.get('resultText');
 
     console.log('OG Image Request:', { question, number, title });
 
     let mainContent;
-    let resultText = '';
     let backgroundColor = '#2a3d45'; // Default background color
 
     if (question && number) {
@@ -37,11 +37,11 @@ export async function GET(req: NextRequest) {
       console.warn('No question, number, or title provided for OG image');
     }
 
-    return new ImageResponse(
+    const image = new ImageResponse(
       (
         <div
           style={{
-            backgroundColor,
+            backgroundColor: '#2a3d45',
             width: '100%',
             height: '100%',
             display: 'flex',
@@ -79,8 +79,46 @@ export async function GET(req: NextRequest) {
         height: 630,
       }
     );
+
+    console.log('Image generated successfully');
+    return image;
   } catch (e) {
     console.error('Error generating image:', e);
-    return new Response(`Failed to generate image: ${(e as Error).message}`, { status: 500 });
+    console.error('Error stack:', (e as Error).stack);
+
+    let errorMessage = 'Unknown error occurred';
+    if (e instanceof Error) {
+      errorMessage = e.message;
+    } else if (typeof e === 'string') {
+      errorMessage = e;
+    }
+
+    // Return a simple error image instead of throwing an error
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            backgroundColor: 'red',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '24px',
+            padding: '20px',
+            textAlign: 'center',
+          }}
+        >
+          <div>Error generating image</div>
+          <div style={{ fontSize: '18px', marginTop: '10px' }}>{errorMessage}</div>
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 630,
+      }
+    );
   }
 }
