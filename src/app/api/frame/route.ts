@@ -151,13 +151,14 @@ export async function POST(req: NextRequest) {
       const imageUrl = `${BASE_URL}/api/og?question=${encodeURIComponent(currentQuestion.question)}&number=${questionIndex + 1}`;
       console.log('Question image URL:', imageUrl);
       html = `
+        <!DOCTYPE html>
         <html>
           <head>
             <meta property="fc:frame" content="vNext" />
             <meta property="fc:frame:image" content="${imageUrl}" />
             ${currentQuestion.answers.map((answer, index) => 
               `<meta property="fc:frame:button:${index + 1}" content="${answer}" />`
-            ).join('')}
+            ).join('\n            ')}
             <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
             <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ questionIndex, score, isInitialLoad: false }))}" />
           </head>
