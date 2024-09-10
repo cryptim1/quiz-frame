@@ -146,7 +146,9 @@ export async function POST(req: NextRequest) {
       }
     } else {
       const currentQuestion = questions[questionIndex];
+      console.log('Current question:', currentQuestion);
       const imageUrl = `${BASE_URL}/api/og?question=${encodeURIComponent(currentQuestion.question)}&number=${questionIndex + 1}`;
+      console.log('Generated image URL:', imageUrl);
       html = `
         <html>
           <head>
