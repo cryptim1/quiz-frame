@@ -64,6 +64,10 @@ export async function POST(req: NextRequest) {
 
     console.log(`Received: questionIndex=${questionIndex}, score=${score}, buttonIndex=${buttonIndex}, isInitialLoad=${isInitialLoad}`);
 
+    // Add the new console.log statements here
+    console.log('Button pressed:', buttonIndex);
+    console.log('Current state:', { questionIndex, score, isInitialLoad });
+
     if (!isInitialLoad && buttonIndex !== undefined) {
       if (questionIndex < questions.length) {
         const currentQuestion = questions[questionIndex];
@@ -148,6 +152,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error in /api/frame:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse(`Internal Server Error: ${error.message}`, { status: 500 });
   }
 }
