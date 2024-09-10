@@ -5,6 +5,7 @@ import { init, fetchQuery } from "@airstack/node";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 init(process.env.AIRSTACK_API_KEY as string);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function validateFarcasterUser(fid: string): Promise<boolean> {
   const query = `
     query MyQuery {
@@ -40,9 +41,11 @@ export async function POST(req: NextRequest) {
     const { untrustedData } = data;
     
     // Add state management
-    const { buttonIndex, fid } = untrustedData;
+    const { buttonIndex } = untrustedData;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fid } = untrustedData;
     const stateString = untrustedData.stateString || '';
-    let [questionIndexStr, scoreStr] = stateString.split(',');
+    const [questionIndexStr, scoreStr] = stateString.split(',');
     let questionIndex = parseInt(questionIndexStr) || 0;
     let score = parseInt(scoreStr) || 0;
 
