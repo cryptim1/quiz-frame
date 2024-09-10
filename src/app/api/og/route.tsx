@@ -14,6 +14,9 @@ export async function GET(req: NextRequest) {
     console.log('OG Image Request:', { question, number, title });
 
     let mainContent;
+    let resultText = '';
+    let backgroundColor = '#2a3d45'; // Default background color
+
     if (question && number) {
       mainContent = `Question ${number}: ${question}`;
     } else if (title) {
@@ -21,10 +24,11 @@ export async function GET(req: NextRequest) {
         const [scoreText, scoreValue] = title.split(':');
         const [score, total] = scoreValue.trim().split('/');
         const isSmarter = Number(score) >= 4;
-        const resultText = isSmarter
-          ? "✓ Congratulations! You are smarter than a 5th grader!"
-          : "✗ Oops! You are not smarter than a 5th grader.";
-        mainContent = `${scoreText}: ${scoreValue}\n\n${resultText}`;
+        resultText = isSmarter
+          ? "Congratulations! You are smarter than a 5th grader!"
+          : "You are not smarter than a 5th grader.";
+        mainContent = `${scoreText}: ${scoreValue}`;
+        backgroundColor = isSmarter ? '#4CAF50' : '#FF5252'; // Green for pass, red for fail
       } else {
         mainContent = title;
       }
@@ -36,7 +40,7 @@ export async function GET(req: NextRequest) {
       (
         <div
           style={{
-            backgroundColor: '#2a3d45',
+            backgroundColor,
             width: '100%',
             height: '100%',
             display: 'flex',
@@ -54,11 +58,19 @@ export async function GET(req: NextRequest) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '40px',
+            fontSize: '60px',
             whiteSpace: 'pre-wrap',
           }}>
             {mainContent}
           </div>
+          {resultText && (
+            <div style={{
+              marginTop: '40px',
+              fontSize: '40px',
+            }}>
+              {resultText}
+            </div>
+          )}
         </div>
       ),
       {
@@ -68,7 +80,6 @@ export async function GET(req: NextRequest) {
     );
   } catch (e) {
     console.error('Error generating image:', e);
-    // Return a simple error image instead of throwing an error
     return new ImageResponse(
       (
         <div
@@ -81,6 +92,8 @@ export async function GET(req: NextRequest) {
             justifyContent: 'center',
             color: 'white',
             fontSize: '24px',
+            padding: '20px',
+            textAlign: 'center',
           }}
         >
           Error generating image: {(e as Error).message}
