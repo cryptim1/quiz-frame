@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { questions } from '@/data/questions';
 import { init, fetchQuery } from "@airstack/node";
 
@@ -19,14 +19,19 @@ async function validateFarcasterUser(fid: string): Promise<boolean> {
     }
   `;
 
-  const { data, error } = await fetchQuery(query);
-  
-  if (error) {
-    console.error("Error validating Farcaster user:", error);
+  try {
+    const { data, error } = await fetchQuery(query);
+    
+    if (error) {
+      console.error("Error validating Farcaster user:", error);
+      return false;
+    }
+
+    return data?.Socials?.Social?.length > 0;
+  } catch (error) {
+    console.error("Error in Airstack API call:", error);
     return false;
   }
-
-  return data?.Socials?.Social?.length > 0;
 }
 
 export async function POST(req: NextRequest) {
@@ -40,7 +45,8 @@ export async function POST(req: NextRequest) {
     // Validate the Farcaster user
     const isValidUser = await validateFarcasterUser(fid);
     if (!isValidUser) {
-      return new NextResponse('Unauthorized', { status: 401 });
+      console.log(`User validation failed for FID: ${fid}`);
+      return new Response('Unauthorized', { status: 401 });
     }
 
     let questionIndex = 0;
@@ -64,10 +70,6 @@ export async function POST(req: NextRequest) {
 
     console.log(`Received: questionIndex=${questionIndex}, score=${score}, buttonIndex=${buttonIndex}, isInitialLoad=${isInitialLoad}`);
 
-    // Add the new console.log statements here
-    console.log('Button pressed:', buttonIndex);
-    console.log('Current state:', { questionIndex, score, isInitialLoad });
-
     if (!isInitialLoad && buttonIndex !== undefined) {
       if (questionIndex < questions.length) {
         const currentQuestion = questions[questionIndex];
@@ -81,7 +83,9 @@ export async function POST(req: NextRequest) {
           : "Oops! I am not smarter than a 5th grader.";
         const shareText = `I scored ${score}/${questions.length} on "Are You Smarter Than a 5th Grader?" quiz! ${resultText} Try it yourself: ${BASE_URL}\n\nFrame made by @cryptim.eth`;
         
-        return new NextResponse(null, {
+        console.log('Redirecting to share:', `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`);
+        
+        return new Response(null, {
           status: 302,
           headers: {
             'Location': `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`
@@ -146,12 +150,12 @@ export async function POST(req: NextRequest) {
 
     console.log(`Sending HTML response for ${isFinished ? 'final result' : `question ${questionIndex + 1}`}`);
 
-    return new NextResponse(html, {
+    return new Response(html, {
       headers: { 'Content-Type': 'text/html' },
       status: 200,
     });
   } catch (error) {
     console.error('Error in /api/frame:', error);
-    return new NextResponse(`Internal Server Error: ${(error as Error).message || 'Unknown error'}`, { status: 500 });
+    return new Response(`Internal Server Error: ${(error as Error).message || 'Unknown error'}`, { status: 500 });
   }
 }
