@@ -40,19 +40,16 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const { untrustedData } = data;
     
-    // Add state management
     const { buttonIndex } = untrustedData;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { fid } = untrustedData;
     const stateString = untrustedData.stateString || '';
-    const [questionIndexStr, scoreStr] = stateString.split(',');
+    let [questionIndexStr, scoreStr] = stateString.split(',');
     let questionIndex = parseInt(questionIndexStr) || 0;
     let score = parseInt(scoreStr) || 0;
 
     // Process the answer if it's not the first load
-    if (buttonIndex !== undefined) {
+    if (buttonIndex !== undefined && questionIndex < questions.length) {
       const currentQuestion = questions[questionIndex];
-      if (buttonIndex === currentQuestion.correctAnswer) {
+      if (buttonIndex === currentQuestion.correctAnswer + 1) { // Add 1 because button indices start from 1
         score++;
       }
       questionIndex++;
