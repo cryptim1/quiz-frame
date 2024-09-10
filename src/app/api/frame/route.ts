@@ -42,9 +42,18 @@ export async function POST(req: NextRequest) {
     // Add state management
     const { buttonIndex, fid } = untrustedData;
     const stateString = untrustedData.stateString || '';
-    const [questionIndexStr, scoreStr] = stateString.split(',');
-    const questionIndex = parseInt(questionIndexStr) || 0;
-    const score = parseInt(scoreStr) || 0;
+    let [questionIndexStr, scoreStr] = stateString.split(',');
+    let questionIndex = parseInt(questionIndexStr) || 0;
+    let score = parseInt(scoreStr) || 0;
+
+    // Process the answer if it's not the first load
+    if (buttonIndex !== undefined) {
+      const currentQuestion = questions[questionIndex];
+      if (buttonIndex === currentQuestion.correctAnswer) {
+        score++;
+      }
+      questionIndex++;
+    }
 
     const isFinished = questionIndex >= questions.length;
 
@@ -60,6 +69,7 @@ export async function POST(req: NextRequest) {
             <meta property="fc:frame:button:1" content="Share Result" />
             <meta property="fc:frame:button:2" content="Play Again" />
             <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
+            <meta property="fc:frame:state" content="${questionIndex},${score}" />
           </head>
         </html>
       `;
@@ -77,6 +87,7 @@ export async function POST(req: NextRequest) {
             <meta property="fc:frame:button:3" content="${currentQuestion.answers[2]}" />
             <meta property="fc:frame:button:4" content="${currentQuestion.answers[3]}" />
             <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
+            <meta property="fc:frame:state" content="${questionIndex},${score}" />
           </head>
         </html>
       `;
