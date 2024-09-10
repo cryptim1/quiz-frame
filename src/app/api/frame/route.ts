@@ -152,6 +152,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error in /api/frame:', error);
-    return new NextResponse(`Internal Server Error: ${error.message}`, { status: 500 });
+    return new NextResponse(`Internal Server Error: ${(error as Error).message || 'Unknown error'}`, { status: 500 });
   }
 }
