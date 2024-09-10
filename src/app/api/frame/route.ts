@@ -68,7 +68,8 @@ export async function POST(req: NextRequest) {
       ? Number(untrustedData.buttonIndex) 
       : undefined;
 
-    console.log(`Received: questionIndex=${questionIndex}, score=${score}, buttonIndex=${buttonIndex}, isInitialLoad=${isInitialLoad}`);
+    console.log('Button pressed:', buttonIndex);
+    console.log('Current state:', { questionIndex, score, isInitialLoad });
 
     if (!isInitialLoad && buttonIndex !== undefined) {
       if (questionIndex < questions.length) {
@@ -109,23 +110,23 @@ export async function POST(req: NextRequest) {
         : "Oops! You are not smarter than a 5th grader.";
       
       html = `
-        <html>
-          <head>
-            <meta property="fc:frame" content="vNext" />
-            <meta property="fc:frame:image" content="${imageUrl}" />
-            <meta property="fc:frame:button:1" content="Share Result" />
-            <meta property="fc:frame:button:1:action" content="post_redirect" />
-            <meta property="fc:frame:button:2" content="Play Again" />
-            <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
-            <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ questionIndex, score, isInitialLoad: false }))}" />
-          </head>
-          <body>
-            <h1>Quiz Completed!</h1>
-            <p>Your Final Score: ${score}/${questions.length}</p>
-            <p>${resultText}</p>
-          </body>
-        </html>
-      `;
+    <html>
+      <head>
+        <meta property="fc:frame" content="vNext" />
+        <meta property="fc:frame:image" content="${imageUrl}" />
+        <meta property="fc:frame:button:1" content="Share Result" />
+        <meta property="fc:frame:button:1:action" content="post_redirect" />
+        <meta property="fc:frame:button:2" content="Play Again" />
+        <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
+        <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ questionIndex, score, isInitialLoad: false }))}" />
+      </head>
+      <body>
+        <h1>Quiz Completed!</h1>
+        <p>Your Final Score: ${score}/${questions.length}</p>
+        <p>${resultText}</p>
+      </body>
+    </html>
+  `;
     } else {
       const currentQuestion = questions[questionIndex];
       const imageUrl = `${BASE_URL}/api/og?question=${encodeURIComponent(currentQuestion.question)}&number=${questionIndex + 1}`;
