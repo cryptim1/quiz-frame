@@ -43,23 +43,23 @@ export async function POST(req: NextRequest) {
     const { buttonIndex } = untrustedData;
     const stateString = untrustedData.stateString || '';
     const [questionIndexStr, scoreStr] = stateString.split(',');
-    let questionIndex = parseInt(questionIndexStr) || -1; // Start at -1 to show first question
+    let questionIndex = parseInt(questionIndexStr) || 0;
     let score = parseInt(scoreStr) || 0;
 
-    // If it's the initial state or a button was clicked, move to the next question
-    if (questionIndex === -1 || buttonIndex !== undefined) {
+    console.log('Received state:', { questionIndex, score, buttonIndex });
+
+    // Process the answer if a button was clicked
+    if (buttonIndex !== undefined) {
+      const currentQuestion = questions[questionIndex];
+      if (buttonIndex === currentQuestion.correctAnswer + 1) {
+        score++;
+      }
       questionIndex++;
     }
 
-    // Process the answer if it's not the first load
-    if (buttonIndex !== undefined && questionIndex > 0 && questionIndex <= questions.length) {
-      const previousQuestion = questions[questionIndex - 1];
-      if (buttonIndex === previousQuestion.correctAnswer + 1) { // Add 1 because button indices start from 1
-        score++;
-      }
-    }
-
     const isFinished = questionIndex >= questions.length;
+
+    console.log('Updated state:', { questionIndex, score, isFinished });
 
     let html = '';
     if (isFinished) {
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    console.log(`Sending response for question ${questionIndex + 1}, score: ${score}`);
+    console.log(`Sending response for ${isFinished ? 'final result' : `question ${questionIndex + 1}`}`);
     return new Response(html, {
       headers: { 'Content-Type': 'text/html' },
       status: 200,
