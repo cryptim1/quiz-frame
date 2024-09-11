@@ -43,16 +43,20 @@ export async function POST(req: NextRequest) {
     const { buttonIndex } = untrustedData;
     const stateString = untrustedData.stateString || '';
     const [questionIndexStr, scoreStr] = stateString.split(',');
-    let questionIndex = parseInt(questionIndexStr) || 0;
+    let questionIndex = parseInt(questionIndexStr) || -1; // Start at -1 to show first question
     let score = parseInt(scoreStr) || 0;
 
+    // If it's the initial state or a button was clicked, move to the next question
+    if (questionIndex === -1 || buttonIndex !== undefined) {
+      questionIndex++;
+    }
+
     // Process the answer if it's not the first load
-    if (buttonIndex !== undefined && questionIndex < questions.length) {
-      const currentQuestion = questions[questionIndex];
-      if (buttonIndex === currentQuestion.correctAnswer + 1) { // Add 1 because button indices start from 1
+    if (buttonIndex !== undefined && questionIndex > 0 && questionIndex <= questions.length) {
+      const previousQuestion = questions[questionIndex - 1];
+      if (buttonIndex === previousQuestion.correctAnswer + 1) { // Add 1 because button indices start from 1
         score++;
       }
-      questionIndex++;
     }
 
     const isFinished = questionIndex >= questions.length;
@@ -93,6 +97,7 @@ export async function POST(req: NextRequest) {
       `;
     }
 
+    console.log(`Sending response for question ${questionIndex + 1}, score: ${score}`);
     return new Response(html, {
       headers: { 'Content-Type': 'text/html' },
       status: 200,
