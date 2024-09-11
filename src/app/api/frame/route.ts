@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         const resultText = score >= 4 
           ? "Congratulations! I am smarter than a 5th grader!" 
           : "Oops! I am not smarter than a 5th grader.";
-        const shareText = `I scored ${score}/${questions.length} on "Are You Smarter Than a 5th Grader?" quiz! ${resultText} Try it yourself: ${BASE_URL}\n\nFrame by @cryptim.eth`;
+        const shareText = `I scored ${score}/${questions.length} on "Are You Smarter Than a 5th Grader?" quiz! ${resultText} Frame by @cryptim.eth\n\nTry it yourself: ${BASE_URL}`;
         
         const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`;
         
