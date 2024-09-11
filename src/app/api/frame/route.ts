@@ -75,7 +75,8 @@ export async function POST(req: NextRequest) {
     if (!isInitialLoad && buttonIndex !== undefined) {
       if (questionIndex < questions.length) {
         const currentQuestion = questions[questionIndex];
-        if (buttonIndex === currentQuestion.correctAnswer) {
+        // Subtract 1 from buttonIndex to match array indexing
+        if (buttonIndex - 1 === currentQuestion.correctAnswer) {
           score++;
         }
         questionIndex++;
