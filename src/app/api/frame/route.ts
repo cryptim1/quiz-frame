@@ -86,15 +86,30 @@ export async function POST(req: NextRequest) {
           : "Oops! I am not smarter than a 5th grader.";
         const shareText = `I scored ${score}/${questions.length} on "Are You Smarter Than a 5th Grader?" quiz! ${resultText} Try it yourself: ${BASE_URL}\n\nFrame by @cryptim.eth`;
         
-        const redirectUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`;
-        console.log('Redirecting to:', redirectUrl);
+        const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`;
         
-        return new Response(null, {
-          status: 302,
-          headers: {
-            'Location': redirectUrl,
-            'Content-Type': 'text/html'
-          }
+        const html = `
+          <html>
+            <head>
+              <meta property="fc:frame" content="vNext" />
+              <meta property="fc:frame:image" content="${BASE_URL}/api/og?title=${encodeURIComponent('Share Your Result!')}" />
+              <meta property="fc:frame:button:1" content="Open Warpcast" />
+              <meta property="fc:frame:button:1:action" content="link" />
+              <meta property="fc:frame:button:1:target" content="${shareUrl}" />
+              <meta property="fc:frame:button:2" content="Back to Results" />
+              <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
+            </head>
+            <body>
+              <h1>Share Your Result</h1>
+              <p>Click 'Open Warpcast' to share your score!</p>
+            </body>
+          </html>
+        `;
+        
+        console.log('Sending share frame HTML');
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html' },
+          status: 200,
         });
       } else if (buttonIndex === 2) { // Play Again button was pressed
         questionIndex = 0;
@@ -119,7 +134,6 @@ export async function POST(req: NextRequest) {
             <meta property="fc:frame" content="vNext" />
             <meta property="fc:frame:image" content="${imageUrl}" />
             <meta property="fc:frame:button:1" content="Share Result" />
-            <meta property="fc:frame:button:1:action" content="post_redirect" />
             <meta property="fc:frame:button:2" content="Play Again" />
             <meta property="fc:frame:post_url" content="${BASE_URL}/api/frame" />
             <meta property="fc:frame:state" content="${encodeURIComponent(JSON.stringify({ questionIndex, score, isInitialLoad: false }))}" />
