@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     
     const { buttonIndex } = untrustedData;
     const stateString = untrustedData.stateString || '';
-    let [questionIndexStr, scoreStr] = stateString.split(',');
+    const [questionIndexStr, scoreStr] = stateString.split(',');
     let questionIndex = parseInt(questionIndexStr) || 0;
     let score = parseInt(scoreStr) || 0;
 
