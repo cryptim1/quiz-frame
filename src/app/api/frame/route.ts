@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     if (!isInitialLoad && buttonIndex !== undefined) {
       if (questionIndex < questions.length) {
         const currentQuestion = questions[questionIndex];
-        if (buttonIndex === currentQuestion.correctAnswer + 1) {
+        if (buttonIndex === currentQuestion.correctAnswer) {
           score++;
         }
         questionIndex++;
@@ -92,7 +92,8 @@ export async function POST(req: NextRequest) {
         return new Response(null, {
           status: 302,
           headers: {
-            'Location': redirectUrl
+            'Location': redirectUrl,
+            'Content-Type': 'text/html'
           }
         });
       } else if (buttonIndex === 2) { // Play Again button was pressed
