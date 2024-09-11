@@ -33,15 +33,16 @@ export async function GET(req: NextRequest) {
         mainContent = title;
       }
     } else {
+      // Default content for the initial frame
       mainContent = 'Are You Smarter Than a 5th Grader?';
-      console.warn('No question, number, or title provided for OG image');
+      resultText = 'Test your knowledge with this quiz!';
     }
 
     const image = new ImageResponse(
       (
         <div
           style={{
-            backgroundColor: '#2a3d45',
+            backgroundColor,
             width: '100%',
             height: '100%',
             display: 'flex',
